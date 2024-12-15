@@ -1,0 +1,86 @@
+import random
+
+class VacuumCleaner:
+    def __init__(self):
+        # Define states and randomize areas and states for each room
+        self.states = ['Dirty', 'Clean', 'In Progress']  # Available states
+        
+        # Randomize the area for each position in Room A and Room B
+        self.rooms = {
+            'A': {1: {'area': random.randint(5, 20), 'state': random.choice(self.states)},  # Position 1 in Room A
+                  2: {'area': random.randint(5, 20), 'state': random.choice(self.states)}},  # Position 2 in Room A
+            'B': {'area': random.randint(5, 20), 'state': random.choice(self.states)}  # Room B (single area)
+        }
+        
+        # Randomly select the starting room and position
+        self.current_room = random.choice(['A', 'B'])
+        self.current_position = random.choice([1, 2]) if self.current_room == 'A' else None
+
+    def clean(self):
+        # Clean the current position or room if it's dirty
+        if self.current_room == 'A':
+            current_state = self.rooms['A'][self.current_position]['state']
+            area = self.rooms['A'][self.current_position]['area']
+            if current_state == 'Dirty':
+                print(f"Cleaning Position {self.current_position} in Room A ({area} sq ft).")
+                self.rooms['A'][self.current_position]['state'] = 'In Progress'
+            elif current_state == 'In Progress':
+                print(f"Position {self.current_position} in Room A is already being cleaned.")
+            else:
+                print(f"Position {self.current_position} in Room A is already clean.")
+        else:
+            current_state = self.rooms['B']['state']
+            area = self.rooms['B']['area']
+            if current_state == 'Dirty':
+                print(f"Cleaning Room B ({area} sq ft).")
+                self.rooms['B']['state'] = 'In Progress'
+            elif current_state == 'In Progress':
+                print(f"Room B is already being cleaned.")
+            else:
+                print(f"Room B is already clean.")
+
+    def finish_cleaning(self):
+        # Finish the cleaning process for the current position or room
+        if self.current_room == 'A':
+            if self.rooms['A'][self.current_position]['state'] == 'In Progress':
+                print(f"Finished cleaning Position {self.current_position} in Room A.")
+                self.rooms['A'][self.current_position]['state'] = 'Clean'
+        else:
+            if self.rooms['B']['state'] == 'In Progress':
+                print("Finished cleaning Room B.")
+                self.rooms['B']['state'] = 'Clean'
+
+    def move(self):
+        # Move between positions in Room A or between Room A and B
+        if self.current_room == 'A':
+            # Move right or left in Room A
+            if self.current_position == 1:  # Move right to Position 2
+                self.current_position = 2
+                print("Moving right to Position 2 in Room A.")
+            else:  # Move left to Position 1
+                self.current_position = 1
+                print("Moving left to Position 1 in Room A.")
+        else:
+            # Move to the other room
+            self.current_room = 'B' if self.current_room == 'A' else 'A'
+            self.current_position = 1 if self.current_room == 'A' else None
+            print(f"Moving to Room {self.current_room}.")
+
+    def run(self):
+        # Simulate the vacuum cleaner's process
+        total_cleaned_area = 0  # Track the total area cleaned
+        print("Starting vacuum cleaning...")
+        for _ in range(6):  # Run for 6 steps
+            self.clean()
+            self.finish_cleaning()
+            # Track cleaned area (adding current position's area)
+            total_cleaned_area += self.rooms['A'][self.current_position]['area'] if self.current_room == 'A' else self.rooms['B']['area']
+            self.move()
+        print("Vacuum cleaning process completed.")
+        print("Total area cleaned:", total_cleaned_area, "sq ft.")
+        print("Final room states:", self.rooms)
+
+
+# Instantiate and run the vacuum cleaner
+vacuum = VacuumCleaner()
+vacuum.run()
